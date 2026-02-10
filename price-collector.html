@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能价格收集系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            padding: 2rem;
+        }
+        
+        .search-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        
+        .search-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .platform-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .platform-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border-radius: 25px;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .platform-item.selected {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-color: #4facfe;
+        }
+        
+        .platform-item input[type="checkbox"] {
+            display: none;
+        }
+        
+        .results-section {
+            display: none;
+        }
+        
+        .results-section.show {
+            display: block;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .results-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+        
+        .export-btn {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .price-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .price-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .platform-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .platform-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .price-info {
+            margin-bottom: 1rem;
+        }
+        
+        .current-price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 0.5rem;
+        }
+        
+        .original-price {
+            text-decoration: line-through;
+            color: #7f8c8d;
+            margin-right: 0.5rem;
+        }
+        
+        .discount {
+            background: #e74c3c;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .product-info {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #27ae60;
+        }
+        
+        .status-indicator.loading {
+            background: #f39c12;
+            animation: pulse 1s infinite;
+        }
+        
+        .status-indicator.error {
+            background: #e74c3c;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .loading-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .comparison-section {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+        
+        .comparison-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .price-comparison {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .best-price {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+        }
+        
+        .highest-price {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 智能价格收集系统</h1>
+            <p>一键收集多平台商品价格，AI智能分析最优选择</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- 搜索区域 -->
+            <div class="search-section">
+                <div class="search-form">
+                    <input type="text" class="search-input" id="productSearch" placeholder="请输入商品名称，如：有机大米 5kg装">
+                    <button class="search-btn" onclick="startPriceCollection()">🔍 开始收集价格</button>
+                </div>
+                
+                <div class="platform-selector">
+                    <label class="platform-item selected">
+                        <input type="checkbox" checked data-platform="jd">
+                        <span>🛒 京东</span>
+                    </label>
+                    <label class="platform-item selected">
+                        <input type="checkbox" checked data-platform="tmall">
+                        <span>🐱 天猫</span>
+                    </label>
+                    <label class="platform-item selected">
+                        <input type="checkbox" checked data-platform="walmart">
+                        <span>🏪 沃尔玛</span>
+                    </label>
+                    <label class="platform-item selected">
+                        <input type="checkbox" checked data-platform="hema">
+                        <span>📦 盒马</span>
+                    </label>
+                    <label class="platform-item selected">
+                        <input type="checkbox" checked data-platform="meituan">
+                        <span>🍜 美团</span>
+                    </label>
+                    <label class="platform-item selected">
+                        <input type="checkbox" checked data-platform="dianping">
+                        <span>⭐ 大众点评</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- 结果展示区域 -->
+            <div class="results-section" id="resultsSection">
+                <div class="results-header">
+                    <h2 class="results-title">价格收集结果</h2>
+                    <button class="export-btn" onclick="exportResults()">📊 导出数据</button>
+                </div>
+                
+                <div class="price-grid" id="priceGrid">
+                    <!-- 价格卡片将在这里动态生成 -->
+                </div>
+                
+                <!-- 价格对比分析 -->
+                <div class="comparison-section">
+                    <h3 class="comparison-title">💡 价格分析</h3>
+                    <div id="priceAnalysis">
+                        <!-- 分析结果将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3>🤖 AI正在收集价格数据...</h3>
+            <p>正在从多个平台获取最新价格信息</p>
+        </div>
+    </div>
+    
+    <script>
+        // 模拟价格数据
+        const mockPriceData = {
+            jd: { name: '京东', price: 89.00, originalPrice: 99.00, discount: '9折', status: 'success', stock: '有货' },
+            tmall: { name: '天猫', price: 92.00, originalPrice: 105.00, discount: '8.8折', status: 'success', stock: '有货' },
+            walmart: { name: '沃尔玛', price: 85.00, originalPrice: 95.00, discount: '限时特价', status: 'success', stock: '有货' },
+            hema: { name: '盒马', price: 95.00, originalPrice: 98.00, discount: '会员价', status: 'success', stock: '有货' },
+            meituan: { name: '美团', price: 88.00, originalPrice: 92.00, discount: '满减优惠', status: 'success', stock: '有货' },
+            dianping: { name: '大众点评', price: 90.00, originalPrice: 100.00, discount: '团购价', status: 'success', stock: '有货' }
+        };
+        
+        // 平台选择器事件
+        document.querySelectorAll('.platform-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+                this.classList.toggle('selected', checkbox.checked);
+            });
+        });
+        
+        // 开始价格收集
+        function startPriceCollection() {
+            const productName = document.getElementById('productSearch').value.trim();
+            if (!productName) {
+                alert('请输入商品名称');
+                return;
+            }
+            
+            const selectedPlatforms = Array.from(document.querySelectorAll('.platform-item.selected input'))
+                .map(input => input.dataset.platform);
+            
+            if (selectedPlatforms.length === 0) {
+                alert('请至少选择一个平台');
+                return;
+            }
+            
+            // 显示加载遮罩
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            // 模拟API调用延迟
+            setTimeout(() => {
+                displayResults(productName, selectedPlatforms);
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('resultsSection').classList.add('show');
+            }, 3000);
+        }
+        
+        // 显示结果
+        function displayResults(productName, platforms) {
+            const priceGrid = document.getElementById('priceGrid');
+            priceGrid.innerHTML = '';
+            
+            platforms.forEach(platform => {
+                const data = mockPriceData[platform];
+                if (data) {
+                    const card = createPriceCard(platform, data, productName);
+                    priceGrid.appendChild(card);
+                }
+            });
+            
+            // 生成价格分析
+            generatePriceAnalysis(platforms);
+        }
+        
+        // 创建价格卡片
+        function createPriceCard(platform, data, productName) {
+            const card = document.createElement('div');
+            card.className = 'price-card';
+            
+            const logoEmoji = {
+                jd: '🛒',
+                tmall: '🐱',
+                walmart: '🏪',
+                hema: '📦',
+                meituan: '🍜',
+                dianping: '⭐'
+            };
+            
+            card.innerHTML = `
+                <div class="status-indicator ${data.status}"></div>
+                <div class="platform-logo">${logoEmoji[platform]}</div>
+                <div class="platform-name">${data.name}</div>
+                <div class="price-info">
+                    <div class="current-price">¥${data.price.toFixed(2)}</div>
+                    <div>
+                        <span class="original-price">¥${data.originalPrice.toFixed(2)}</span>
+                        <span class="discount">${data.discount}</span>
+                    </div>
+                </div>
+                <div class="product-info">
+                    商品：${productName}<br>
+                    库存：${data.stock}<br>
+                    更新时间：${new Date().toLocaleString()}
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // 生成价格分析
+        function generatePriceAnalysis(platforms) {
+            const analysisDiv = document.getElementById('priceAnalysis');
+            const prices = platforms.map(p => mockPriceData[p]).filter(d => d);
+            
+            if (prices.length === 0) return;
+            
+            const sortedPrices = [...prices].sort((a, b) => a.price - b.price);
+            const lowest = sortedPrices[0];
+            const highest = sortedPrices[sortedPrices.length - 1];
+            const average = prices.reduce((sum, p) => sum + p.price, 0) / prices.length;
+            
+            analysisDiv.innerHTML = `
+                <div class="price-comparison best-price">
+                    <div>
+                        <strong>🏆 最低价格</strong><br>
+                        <small>${lowest.name}</small>
+                    </div>
+                    <div style="text-align: right;">
+                        <strong>¥${lowest.price.toFixed(2)}</strong><br>
+                        <small>节省 ¥${(highest.price - lowest.price).toFixed(2)}</small>
+                    </div>
+                </div>
+                <div class="price-comparison highest-price">
+                    <div>
+                        <strong>📈 最高价格</strong><br>
+                        <small>${highest.name}</small>
+                    </div>
+                    <div style="text-align: right;">
+                        <strong>¥${highest.price.toFixed(2)}</strong><br>
+                        <small>高出 ${(((highest.price - lowest.price) / lowest.price) * 100).toFixed(1)}%</small>
+                    </div>
+                </div>
+                <div class="price-comparison">
+                    <div>
+                        <strong>📊 平均价格</strong><br>
+                        <small>所有平台均价</small>
+                    </div>
+                    <div style="text-align: right;">
+                        <strong>¥${average.toFixed(2)}</strong><br>
+                        <small>价格区间 ¥${(highest.price - lowest.price).toFixed(2)}</small>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 导出结果
+        function exportResults() {
+            const productName = document.getElementById('productSearch').value;
+            const results = {
+                product: productName,
+                timestamp: new Date().toISOString(),
+                prices: mockPriceData
+            };
+            
+            const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `price_comparison_${productName}_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // 实际的API调用函数（示例）
+        async function collectRealPrices(productName, platforms) {
+            const results = {};
+            
+            for (const platform of platforms) {
+                try {
+                    // 这里应该调用实际的API或爬虫服务
+                    const response = await fetch(`/api/price-collector/${platform}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ product: productName })
+                    });
+                    
+                    results[platform] = await response.json();
+                } catch (error) {
+                    console.error(`Failed to collect price from ${platform}:`, error);
+                    results[platform] = { error: error.message };
+                }
+            }
+            
+            return results;
+        }
+    </script>
+</body>
+</html>

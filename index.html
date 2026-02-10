@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字关爱平台 - 商家捐赠物价格审核系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部导航 -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-heart"></i>
+                    <span>数字关爱平台</span>
+                </div>
+                <div class="header-info">
+                    <span class="user-info">审核员：张小明</span>
+                    <span class="pending-count">待审核：<span id="pendingCount">12</span></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 左侧：商品信息 -->
+            <div class="product-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>商品信息</h2>
+                        <div class="ai-status">
+                            <i class="fas fa-robot"></i>
+                            <span class="ai-label">AI智能分析</span>
+                        </div>
+                    </div>
+                    
+                    <div class="product-info">
+                        <div class="product-image">
+                            <img src="https://via.placeholder.com/200x200?text=商品图片" alt="商品图片" id="productImage">
+                        </div>
+                        
+                        <div class="product-details">
+                            <h3 id="productName">有机大米 5kg装</h3>
+                            <div class="merchant-info">
+                                <span class="merchant-name">爱心超市（王府井店）</span>
+                                <span class="merchant-location">北京市东城区</span>
+                            </div>
+                            
+                            <div class="price-info">
+                                <div class="current-price">
+                                    <label>申报价格</label>
+                                    <span class="price-value" id="declaredPrice">¥89.00</span>
+                                </div>
+                                
+                                <div class="market-price">
+                                    <label>市场参考价</label>
+                                    <span class="price-value" id="marketPrice">¥65.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：AI分析结果 -->
+            <div class="analysis-section">
+                <!-- AI风险评估 -->
+                <div class="card risk-assessment">
+                    <div class="card-header">
+                        <h3>AI风险评估</h3>
+                        <div class="risk-level high" id="riskLevel">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>高风险</span>
+                        </div>
+                    </div>
+                    
+                    <div class="risk-details">
+                        <div class="risk-item">
+                            <div class="risk-icon warning">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="risk-content">
+                                <h4>价格异常</h4>
+                                <p>申报价格比市场价高出 <strong>36.9%</strong></p>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-item">
+                            <div class="risk-icon info">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <div class="risk-content">
+                                <h4>商家历史</h4>
+                                <p>该商家过去3个月平均溢价 <strong>28%</strong></p>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-item">
+                            <div class="risk-icon success">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="risk-content">
+                                <h4>区域对比</h4>
+                                <p>同区域商家平均价格 <strong>¥62.5</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 价格分析图表 -->
+                <div class="card chart-section">
+                    <div class="card-header">
+                        <h3>价格对比分析</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 历史记录 -->
+                <div class="card history-section">
+                    <div class="card-header">
+                        <h3>商家历史记录</h3>
+                    </div>
+                    <div class="history-list">
+                        <div class="history-item">
+                            <div class="history-date">2026-02-08</div>
+                            <div class="history-product">东北大米 10kg</div>
+                            <div class="history-status approved">通过</div>
+                        </div>
+                        <div class="history-item">
+                            <div class="history-date">2026-02-05</div>
+                            <div class="history-product">有机蔬菜礼盒</div>
+                            <div class="history-status rejected">驳回</div>
+                        </div>
+                        <div class="history-item">
+                            <div class="history-date">2026-02-01</div>
+                            <div class="history-product">纯净水 24瓶装</div>
+                            <div class="history-status approved">通过</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 底部操作区域 -->
+        <div class="action-section">
+            <div class="card">
+                <div class="action-header">
+                    <h3>审核操作</h3>
+                    <div class="ai-suggestion">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>AI建议：建议驳回，价格明显偏高</span>
+                    </div>
+                </div>
+                
+                <div class="action-content">
+                    <div class="action-buttons">
+                        <button class="btn btn-approve" onclick="approveItem()">
+                            <i class="fas fa-check"></i>
+                            通过审核
+                        </button>
+                        <button class="btn btn-reject" onclick="rejectItem()">
+                            <i class="fas fa-times"></i>
+                            驳回申请
+                        </button>
+                        <button class="btn btn-request-info" onclick="requestMoreInfo()">
+                            <i class="fas fa-question-circle"></i>
+                            要求补充信息
+                        </button>
+                    </div>
+                    
+                    <div class="comment-section">
+                        <label for="reviewComment">审核意见</label>
+                        <textarea id="reviewComment" placeholder="请输入审核意见..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 待审核列表（侧边栏） -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>待审核列表</h3>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <div class="pending-list">
+                <div class="pending-item active" onclick="loadItem(1)">
+                    <div class="item-info">
+                        <div class="item-name">有机大米 5kg装</div>
+                        <div class="item-merchant">爱心超市（王府井店）</div>
+                        <div class="item-price">¥89.00</div>
+                    </div>
+                    <div class="item-risk high">高风险</div>
+                </div>
+                
+                <div class="pending-item" onclick="loadItem(2)">
+                    <div class="item-info">
+                        <div class="item-name">儿童营养奶粉</div>
+                        <div class="item-merchant">母婴用品店</div>
+                        <div class="item-price">¥298.00</div>
+                    </div>
+                    <div class="item-risk medium">中风险</div>
+                </div>
+                
+                <div class="pending-item" onclick="loadItem(3)">
+                    <div class="item-info">
+                        <div class="item-name">学习用品套装</div>
+                        <div class="item-merchant">文具专营店</div>
+                        <div class="item-price">¥45.00</div>
+                    </div>
+                    <div class="item-risk low">低风险</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认对话框 -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">确认操作</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">确定要执行此操作吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" id="confirmBtn" onclick="confirmAction()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
